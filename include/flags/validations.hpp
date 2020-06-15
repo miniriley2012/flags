@@ -8,13 +8,17 @@
 #include "option.hpp"
 
 namespace flags::validations {
+    [[maybe_unused]]
     bool number(const option &option);
 
+    [[maybe_unused]]
     bool floating_point(const option &option);
 
+    [[maybe_unused]]
     bool file_exists(const option &option);
 
-    std::function<bool(option)> file_extension(const std::string &extension);
+    [[maybe_unused]]
+    std::function<bool(flags::option)> file_extension(const std::string &extension);
 }
 
 #endif //FLAGS_VALIDATIONS_HPP
