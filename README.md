@@ -3,9 +3,9 @@
 Flags is flag parser for C++20.
 
 ## Usage
-See [examples](examples).
+See [examples](tests).
 
 ## TODO
 
-* [ ] improve documentation
+* [ ] Improve documentation and API
 * [ ] Messages for validation errors

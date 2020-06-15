@@ -14,11 +14,13 @@ flags::option_spec &flags::option_spec::add_option(flags::option option) {
     if (name.length() > 2 && !name.starts_with("--")) {
         name.insert(0, "--");
     }
-    if (options.contains(option.name)) throw duplicate_option(name);
+    if (options.contains(option.name))
+        throw std::invalid_argument{"Found duplicate option '" + name + "'."};
     options[option.name] = option;
     if (option.shorthand != -1) {
         if (shorthand.contains(option.shorthand)) {
-            throw duplicate_shorthand(option.shorthand, name, shorthand[option.shorthand]);
+            throw std::invalid_argument{"Found duplicate shorthand option '-"s + option.shorthand + "' for " + name +
+                                        ". It is currently assigned to " + shorthand[option.shorthand] + '.'};
         }
         shorthand[option.shorthand] = name;
     }
@@ -32,7 +34,7 @@ flags::parse_result flags::option_spec::parse(int argc, const char **argv) {
         std::transform(options.begin(), options.end(), std::back_inserter(result.options),
                        [](auto pair) {
                            const auto &option = pair.second;
-                           if (option.required) throw missing_required(option.name);
+                           if (option.required) throw parse_error{missing_required, option};
                            return option;
                        });
         return result;
@@ -48,13 +50,13 @@ flags::parse_result flags::option_spec::parse(int argc, const char **argv) {
             for (std::size_t j = 1; j < arg.size(); j++) {
                 if (shorthand.contains(arg[j])) {
                     if (auto &option = options[shorthand[arg[j]]]; option.has_value && j < arg.size() - 1) {
-                        throw missing_value{"-"s + arg[j]};
+                        throw parse_error{missing_value, option, "-"s + arg[j]};
                     } else {
                         option.present = true;
                         overrides.merge(option.overrides);
                     }
                 } else {
-                    throw undefined_option{"-"s + arg[j]};
+                    throw parse_error{undefined, std::nullopt, "-"s + arg[j]};
                 }
             }
             arg = ("-") + arg.back();
@@ -66,20 +68,20 @@ flags::parse_result flags::option_spec::parse(int argc, const char **argv) {
             overrides.merge(option.overrides);
             if (option.has_value) {
                 i++;
-                if (i > args.size() - 1) throw missing_value(arg);
+                if (i > args.size() - 1) throw parse_error{missing_value, option};
                 option.value = args[i];
             }
-            if (option.validate && !option.validate(option)) throw validation_error(option.name);
+            if (option.validate && !option.validate(option)) throw parse_error{validation_error, option};
         } else {
-            if (arg.starts_with("-")) throw undefined_option(arg);
+            if (arg.starts_with("-")) throw parse_error{undefined, std::nullopt, arg};
             result.remaining.emplace_back(arg);
         }
     }
 
-    for (const auto&[_, opt] : options) {
-        if (!(overrides.contains("*") || overrides.contains(opt.name)) && opt.required && !opt.present)
-            throw missing_required{opt.name};
-        result.options.push_back(opt);
+    for (const auto&[_, option] : options) {
+        if (!(overrides.contains("*") || overrides.contains(option.name)) && option.required && !option.present)
+            throw parse_error{missing_required, option};
+        result.options.push_back(option);
     }
 
     return result;
