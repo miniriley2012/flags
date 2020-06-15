@@ -46,6 +46,12 @@ flags::parse_result flags::option_spec::parse(int argc, const char **argv) {
     for (std::size_t i = 0; i < args.size(); i++) {
         std::string arg = args[i];
 
+        if (arg == "--") {
+            result.remaining.reserve(result.remaining.size() + (args.size() - i - 1));
+            result.remaining.insert(result.remaining.end(), args.begin() + i + 1, args.end());
+            break;
+        }
+
         if (arg.starts_with("-") && arg.size() > 2 && arg[1] != '-') {
             for (std::size_t j = 1; j < arg.size(); j++) {
                 if (shorthand.contains(arg[j])) {
