@@ -77,7 +77,7 @@ flags::parse_result flags::option_spec::parse(int argc, const char **argv) {
                 if (i > args.size() - 1) throw parse_error{missing_value, option};
                 option.value = args[i];
             }
-            if (option.validate && !option.validate(option)) throw parse_error{validation_error, option};
+            if (option.validator && !option.validator(option)) throw parse_error{validation_error, option};
         } else {
             if (arg.starts_with("-")) throw parse_error{undefined, std::nullopt, arg};
             result.remaining.emplace_back(arg);

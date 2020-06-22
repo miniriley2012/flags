@@ -20,7 +20,7 @@ int main(int argc, const char **argv) {
                                         .shorthand = 'c',
                                         .has_value = true,
                                         .usage = "Path to config file",
-                                        .validate = flags::validations::file_exists
+                                        .validator = flags::validations::file_exists
                                 })
                     .add_option({
                                         .name = "--thing",
