@@ -18,62 +18,40 @@ namespace options {
         std::string name;
         char shorthand = -1;
         bool has_value;
-        std::string value;
+        std::string default_value;
         std::string usage;
         bool required;
         overrides_type overrides;
         validator_type validator;
         bool present;
+        std::string value;
 
-        option &set_name(std::string_view option_name) {
-            name = option_name;
-            return *this;
+        option &set_name(std::string_view option_name);
+
+        option &set_shorthand(char option_shorthand);
+
+        option &set_value(std::string_view option_value);
+
+        option &clear_value();
+
+        option &set_usage(std::string_view option_usage);
+
+        option &set_required(bool option_required);
+
+        option &set_overrides(overrides_type option_overrides);
+
+        option &add_override(const std::string &option_override);
+
+        option &clear_overrides();
+
+        option &set_validator(const validator_type &option_validator);
+
+        [[nodiscard]] constexpr bool has_shorthand() const {
+            return shorthand > 0;
         }
 
-        option &set_shorthand(char option_shorthand) {
-            shorthand = option_shorthand;
-            return *this;
-        }
-
-        option &set_value(std::string_view option_value) {
-            value = option_value;
-            has_value = true;
-            return *this;
-        }
-
-        option &clear_value() {
-            has_value = false;
-            return *this;
-        }
-
-        option &set_usage(std::string_view option_usage) {
-            usage = option_usage;
-            return *this;
-        }
-
-        option &set_required(bool option_required) {
-            required = option_required;
-            return *this;
-        }
-
-        option &set_overrides(overrides_type option_overrides) {
-            overrides = std::move(option_overrides);
-            return *this;
-        }
-
-        option &add_override(const std::string &option_override) {
-            overrides.insert(option_override);
-            return *this;
-        }
-
-        option &clear_overrides() {
-            overrides.clear();
-            return *this;
-        }
-
-        option &set_validator(const validator_type &option_validator) {
-            validator = option_validator;
-            return *this;
+        constexpr explicit operator bool() const {
+            return present;
         }
     };
 }

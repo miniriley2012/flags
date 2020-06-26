@@ -3,7 +3,7 @@ project(options)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_library(${PROJECT_NAME} src/option_spec.cpp src/validations.cpp src/errors.cpp)
+add_library(${PROJECT_NAME} src/option_spec.cpp src/validations.cpp src/errors.cpp src/app.cpp src/option.cpp)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)

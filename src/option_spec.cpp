@@ -10,6 +10,7 @@ using namespace options::errors;
 using namespace std::string_literals;
 
 options::option_spec &options::option_spec::add_option(options::option option) {
+    if (!option.default_value.empty()) option.value = option.default_value;
     auto &name = option.name;
     if (name.length() > 2 && !name.starts_with("--")) {
         name.insert(0, "--");
@@ -27,15 +28,19 @@ options::option_spec &options::option_spec::add_option(options::option option) {
     return *this;
 }
 
+const std::map<std::string, options::option> &options::option_spec::get_options() {
+    return options_;
+}
+
 options::parse_result options::option_spec::parse(int argc, const char **argv) {
     parse_result result;
 
     if (argc < 2) {
-        std::transform(options_.begin(), options_.end(), std::back_inserter(result.options),
-                       [](auto pair) {
+        std::transform(options_.begin(), options_.end(), std::inserter(result.options, result.options.begin()),
+                       [](const auto &pair) -> decltype(result.options)::value_type {
                            const auto &option = pair.second;
                            if (option.required) throw parse_error{missing_required, option};
-                           return option;
+                           return {option.name, option};
                        });
         return result;
     }
@@ -59,7 +64,8 @@ options::parse_result options::option_spec::parse(int argc, const char **argv) {
                         throw parse_error{missing_value, option, "-"s + arg[j]};
                     } else {
                         option.present = true;
-                        overrides.merge(option.overrides);
+                        std::copy(option.overrides.begin(), option.overrides.end(),
+                                  std::inserter(overrides, overrides.begin()));
                     }
                 } else {
                     throw parse_error{undefined, std::nullopt, "-"s + arg[j]};
@@ -71,13 +77,13 @@ options::parse_result options::option_spec::parse(int argc, const char **argv) {
         if (options_.contains(arg)) {
             auto &option = options_[arg];
             option.present = true;
-            overrides.merge(option.overrides);
+            std::copy(option.overrides.begin(), option.overrides.end(),
+                      std::inserter(overrides, overrides.begin()));
             if (option.has_value) {
                 i++;
                 if (i > args.size() - 1) throw parse_error{missing_value, option};
                 option.value = args[i];
             }
-            if (option.validator && !option.validator(option)) throw parse_error{validation_error, option};
         } else {
             if (arg.starts_with("-")) throw parse_error{undefined, std::nullopt, arg};
             result.remaining.emplace_back(arg);
@@ -85,9 +91,11 @@ options::parse_result options::option_spec::parse(int argc, const char **argv) {
     }
 
     for (const auto&[_, option] : options_) {
-        if (!(overrides.contains("*") || overrides.contains(option.name)) && option.required && !option.present)
+        const bool overridden = (overrides.contains("*") || overrides.contains(option.name));
+        if (!overridden && option.required && !option.present)
             throw parse_error{missing_required, option};
-        result.options.push_back(option);
+        if (!overridden && option.validator && !option.validator(option)) throw parse_error{validation_error, option};
+        result.options[option.name] = option;
     }
 
     return result;

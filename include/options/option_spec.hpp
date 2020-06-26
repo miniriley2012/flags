@@ -15,8 +15,13 @@
 namespace options {
     /// Contains the parsed options and the remaining arguments.
     struct parse_result {
-        std::vector<option> options;
+        std::map<std::string, option> options;
         std::vector<std::string> remaining;
+
+        option operator[](std::string key) {
+            if (!key.starts_with("--")) key = "--" + key;
+            return options[key];
+        };
     };
 
     /// Used to define options.
@@ -29,6 +34,10 @@ namespace options {
         /// \param option option to add
         /// \return reference to self
         option_spec &add_option(option option);
+
+        /// Returns a copy of options.
+        /// \return a copy of options
+        const std::map<std::string, option> &get_options();
 
         /// Parses options in argv and returns a parse_result.
         /// \param argc argc from main
