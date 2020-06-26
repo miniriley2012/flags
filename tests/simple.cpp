@@ -2,13 +2,13 @@
 // Created by Riley Quinn on 6/14/20.
 //
 
-#include <flags/option_spec.hpp>
-#include <flags/validations.hpp>
+#include <options/option_spec.hpp>
+#include <options/validations.hpp>
 #include <iostream>
 
 int main(int argc, const char **argv) {
-    flags::parse_result result = flags::parse_options(
-            flags::option_spec{}
+    options::parse_result result = options::parse_options(
+            options::option_spec{}
                     .add_option({
                                         .name = "--help",
                                         .shorthand = 'h',
@@ -20,7 +20,7 @@ int main(int argc, const char **argv) {
                                         .shorthand = 'c',
                                         .has_value = true,
                                         .usage = "Path to config file",
-                                        .validator = flags::validations::file_exists
+                                        .validator = options::validations::file_exists
                                 })
                     .add_option({
                                         .name = "--thing",

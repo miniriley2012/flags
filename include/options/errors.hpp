@@ -2,13 +2,13 @@
 // Created by Riley Quinn on 6/14/20.
 //
 
-#ifndef FLAGS_ERRORS_HPP
-#define FLAGS_ERRORS_HPP
+#ifndef OPTIONS_ERRORS_HPP
+#define OPTIONS_ERRORS_HPP
 
 #include "option.hpp"
 #include <stdexcept>
 
-namespace flags::errors {
+namespace options::errors {
     enum option_error {
         undefined = 1,
         missing_value,
@@ -43,10 +43,10 @@ namespace flags::errors {
     /// General struct for parsing errors.
     struct parse_error : std::runtime_error {
         const option_error type;
-        const std::optional<flags::option> option;
+        const std::optional<options::option> option;
 
         // I know this is a mess. I might clean it up later.
-        parse_error(const option_error type, const std::optional<flags::option> &option, const std::string &value = "")
+        parse_error(const option_error type, const std::optional<options::option> &option, const std::string &value = "")
                 : runtime_error(
                 value.empty() ? option ? make_option_error_str(type, option->name) : option_error_str(type)
                               : make_option_error_str(type, value)),
@@ -54,4 +54,4 @@ namespace flags::errors {
     };
 }
 
-#endif //FLAGS_ERRORS_HPP
+#endif //OPTIONS_ERRORS_HPP

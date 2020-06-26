@@ -2,8 +2,8 @@
 // Created by Riley Quinn on 6/14/20.
 //
 
-#ifndef FLAGS_OPTION_SPEC_HPP
-#define FLAGS_OPTION_SPEC_HPP
+#ifndef OPTIONS_OPTION_SPEC_HPP
+#define OPTIONS_OPTION_SPEC_HPP
 
 #include "option.hpp"
 #include <iostream>
@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-namespace flags {
+namespace options {
     /// Contains the parsed options and the remaining arguments.
     struct parse_result {
         std::vector<option> options;
@@ -21,8 +21,8 @@ namespace flags {
 
     /// Used to define options.
     class option_spec {
-        std::map<std::string, option> options;
-        std::unordered_map<char, std::string> shorthand;
+        std::map<std::string, option> options_;
+        std::unordered_map<char, std::string> shorthand_;
 
     public:
         /// Adds an option to the option spec.
@@ -53,4 +53,4 @@ namespace flags {
     }
 }
 
-#endif //FLAGS_OPTION_SPEC_HPP
+#endif //OPTIONS_OPTION_SPEC_HPP

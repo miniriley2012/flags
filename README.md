@@ -1,6 +1,6 @@
-# Flags
+# Options
 
-Flags is flag parser for C++20.
+Options is an option parser for C++20.
 
 ## Usage
 See [examples](tests).

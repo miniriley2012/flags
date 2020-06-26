@@ -2,36 +2,36 @@
 // Created by Riley Quinn on 6/14/20.
 //
 
-#include "flags/option_spec.hpp"
+#include "options/option_spec.hpp"
 
-#include "flags/errors.hpp"
+#include "options/errors.hpp"
 
-using namespace flags::errors;
+using namespace options::errors;
 using namespace std::string_literals;
 
-flags::option_spec &flags::option_spec::add_option(flags::option option) {
+options::option_spec &options::option_spec::add_option(options::option option) {
     auto &name = option.name;
     if (name.length() > 2 && !name.starts_with("--")) {
         name.insert(0, "--");
     }
-    if (options.contains(option.name))
+    if (options_.contains(option.name))
         throw std::invalid_argument{"Found duplicate option '" + name + "'."};
-    options[option.name] = option;
+    options_[option.name] = option;
     if (option.shorthand != -1) {
-        if (shorthand.contains(option.shorthand)) {
+        if (shorthand_.contains(option.shorthand)) {
             throw std::invalid_argument{"Found duplicate shorthand option '-"s + option.shorthand + "' for " + name +
-                                        ". It is currently assigned to " + shorthand[option.shorthand] + '.'};
+                                        ". It is currently assigned to " + shorthand_[option.shorthand] + '.'};
         }
-        shorthand[option.shorthand] = name;
+        shorthand_[option.shorthand] = name;
     }
     return *this;
 }
 
-flags::parse_result flags::option_spec::parse(int argc, const char **argv) {
+options::parse_result options::option_spec::parse(int argc, const char **argv) {
     parse_result result;
 
     if (argc < 2) {
-        std::transform(options.begin(), options.end(), std::back_inserter(result.options),
+        std::transform(options_.begin(), options_.end(), std::back_inserter(result.options),
                        [](auto pair) {
                            const auto &option = pair.second;
                            if (option.required) throw parse_error{missing_required, option};
@@ -54,8 +54,8 @@ flags::parse_result flags::option_spec::parse(int argc, const char **argv) {
 
         if (arg.starts_with("-") && arg.size() > 2 && arg[1] != '-') {
             for (std::size_t j = 1; j < arg.size(); j++) {
-                if (shorthand.contains(arg[j])) {
-                    if (auto &option = options[shorthand[arg[j]]]; option.has_value && j < arg.size() - 1) {
+                if (shorthand_.contains(arg[j])) {
+                    if (auto &option = options_[shorthand_[arg[j]]]; option.has_value && j < arg.size() - 1) {
                         throw parse_error{missing_value, option, "-"s + arg[j]};
                     } else {
                         option.present = true;
@@ -67,9 +67,9 @@ flags::parse_result flags::option_spec::parse(int argc, const char **argv) {
             }
             arg = ("-") + arg.back();
         }
-        if (arg.length() == 2 && shorthand.contains(arg[1])) arg = shorthand[arg[1]];
-        if (options.contains(arg)) {
-            auto &option = options[arg];
+        if (arg.length() == 2 && shorthand_.contains(arg[1])) arg = shorthand_[arg[1]];
+        if (options_.contains(arg)) {
+            auto &option = options_[arg];
             option.present = true;
             overrides.merge(option.overrides);
             if (option.has_value) {
@@ -84,7 +84,7 @@ flags::parse_result flags::option_spec::parse(int argc, const char **argv) {
         }
     }
 
-    for (const auto&[_, option] : options) {
+    for (const auto&[_, option] : options_) {
         if (!(overrides.contains("*") || overrides.contains(option.name)) && option.required && !option.present)
             throw parse_error{missing_required, option};
         result.options.push_back(option);

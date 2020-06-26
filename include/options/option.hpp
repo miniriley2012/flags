@@ -2,14 +2,14 @@
 // Created by Riley Quinn on 6/14/20.
 //
 
-#ifndef FLAGS_OPTION_HPP
-#define FLAGS_OPTION_HPP
+#ifndef OPTIONS_OPTION_HPP
+#define OPTIONS_OPTION_HPP
 
 #include <string>
 #include <unordered_set>
 #include <utility>
 
-namespace flags {
+namespace options {
     /// Used in option_spec and validators.
     struct option {
         using overrides_type = std::unordered_set<std::string>;
@@ -78,4 +78,4 @@ namespace flags {
     };
 }
 
-#endif //FLAGS_OPTION_HPP
+#endif //OPTIONS_OPTION_HPP
