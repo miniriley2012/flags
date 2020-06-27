@@ -18,6 +18,9 @@ namespace options::validations {
     bool file_exists(const option &option);
 
     [[maybe_unused]]
+    bool file_not_exists(const option &option);
+
+    [[maybe_unused]]
     std::function<bool(options::option)> file_extension(const std::string &extension);
 }
 

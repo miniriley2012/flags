@@ -24,6 +24,10 @@ bool options::validations::file_exists(const options::option &option) {
     return std::filesystem::exists(option.value());
 }
 
+bool options::validations::file_not_exists(const options::option &option) {
+    return !file_exists(option);
+}
+
 [[maybe_unused]]
 std::function<bool(options::option)> options::validations::file_extension(const std::string &extension) {
     return [&extension](const option &option) {

@@ -7,6 +7,7 @@
 
 #include "option.hpp"
 #include "option_spec.hpp"
+#include "app.hpp"
 #include "errors.hpp"
 #include "validations.hpp"
 
