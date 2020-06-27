@@ -48,7 +48,7 @@ namespace options::errors {
         // I know this is a mess. I might clean it up later.
         parse_error(const option_error type, const std::optional<options::option> &option, const std::string &value = "")
                 : runtime_error(
-                value.empty() ? option ? make_option_error_str(type, option->name) : option_error_str(type)
+                value.empty() ? option ? make_option_error_str(type, option->name()) : option_error_str(type)
                               : make_option_error_str(type, value)),
                   type(type), option(option) {}
     };

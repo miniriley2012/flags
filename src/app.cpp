@@ -4,17 +4,13 @@
 
 #include "options/app.hpp"
 
-std::string_view options::app::name() const {
-    return name_;
-}
-
 options::app &options::app::name(std::string_view name) {
     name_ = name;
     return *this;
 }
 
-std::string_view options::app::description() const {
-    return description_;
+std::string options::app::name() const {
+    return name_;
 }
 
 options::app &options::app::description(std::string_view description) {
@@ -22,8 +18,8 @@ options::app &options::app::description(std::string_view description) {
     return *this;
 }
 
-std::string_view options::app::usage() const {
-    return usage_;
+std::string options::app::description() const {
+    return description_;
 }
 
 options::app &options::app::usage(std::string_view usage) {
@@ -31,13 +27,12 @@ options::app &options::app::usage(std::string_view usage) {
     return *this;
 }
 
-options::app &options::app::add_help_flag(const std::string &name = "help", char shorthand = 'h',
-                                          const std::string &usage = "Shows this help menu") {
-    spec_.add_option({
-                             .name = name,
-                             .shorthand = shorthand,
-                             .usage = usage
-                     });
+std::string options::app::usage() const {
+    return usage_;
+}
+
+options::app &options::app::add_option(const options::option &option) {
+    spec_.add_option(option);
     return *this;
 }
 
@@ -48,15 +43,15 @@ std::string options::app::default_usage() {
 
     for (const auto &[_, option] : spec_.get_options()) {
         std::string str;
-        if (!option.required) {
-            str += "[" + option.name;
-            if (option.has_value) {
+        if (!option.required()) {
+            str += "[" + option.name();
+            if (option.has_value()) {
                 str += " value";
             }
             str += "]";
         } else {
-            str += option.name;
-            if (option.has_value) {
+            str += option.name();
+            if (option.has_value()) {
                 str += " value";
             }
         }
@@ -81,22 +76,22 @@ std::string options::app::help() {
     for (const auto &[_, option] : options) {
         result += "\t";
         if (option.has_shorthand()) {
-            result += std::string("-") + option.shorthand + ", ";
+            result += std::string("-") + option.shorthand() + ", ";
         }
-        result += option.name + std::string(length - option.name.length(), ' ') + option.usage;
-        if (!option.default_value.empty() || !option.overrides.empty()) {
+        result += option.name() + std::string(length - option.name().length(), ' ') + option.usage();
+        if (!option.default_value().empty() || !option.overrides().empty()) {
             result += " (";
-            if (!option.value.empty()) {
-                result += "default: \"" + option.default_value + "\"";
-                if (!option.overrides.empty()) {
+            if (!option.value().empty()) {
+                result += "default: \"" + option.default_value() + "\"";
+                if (!option.overrides().empty()) {
                     result += ", ";
                 }
             }
-            if (!option.overrides.empty()) {
+            if (!option.overrides().empty()) {
                 result += "overrides: {";
-                for (auto it = option.overrides.begin(); it != option.overrides.end();) {
+                for (auto it = option.overrides().begin(); it != option.overrides().end();) {
                     result += "\"" + (*it) + "\"";
-                    if (++it != option.overrides.end()) {
+                    if (++it != option.overrides().end()) {
                         result += ", ";
                     }
                 }

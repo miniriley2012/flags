@@ -20,7 +20,8 @@ namespace options {
 
         option operator[](std::string key) {
             if (!key.starts_with("--")) key = "--" + key;
-            return options[key];
+            if (options.contains(key)) return options.at(key);
+            return {};
         };
     };
 
@@ -52,7 +53,7 @@ namespace options {
     /// \param argc argc from main
     /// \param argv argv from main
     /// \return A parse_result containing the options and remaining arguments
-    inline parse_result parse_options(option_spec spec, int argc, const char **argv) noexcept {
+    inline parse_result parse_options(option_spec &spec, int argc, const char **argv) noexcept {
         try {
             return spec.parse(argc, argv);
         } catch (const std::exception &e) {

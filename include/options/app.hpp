@@ -13,19 +13,19 @@ namespace options {
     class app {
     public:
 
-        [[nodiscard]] std::string_view name() const;
-
         app &name(std::string_view name);
 
-        [[nodiscard]] std::string_view description() const;
+        [[nodiscard]] std::string name() const;
 
         app &description(std::string_view description);
 
-        [[nodiscard]] std::string_view usage() const;
+        [[nodiscard]] std::string description() const;
 
         app &usage(std::string_view usage);
 
-        options::app &add_help_flag(const std::string &name, char shorthand, const std::string &usage);
+        [[nodiscard]] std::string usage() const;
+
+        options::app &add_option(const option &option);
 
         [[nodiscard]] std::string default_usage();
 
@@ -46,6 +46,10 @@ namespace options {
 
         options::option_spec spec_;
     };
+
+    inline parse_result parse_options(app &app, int argc, const char **argv) noexcept {
+        return parse_options(app.option_spec(), argc, argv);
+    }
 }
 
 #endif //OPTIONS_APP_HPP

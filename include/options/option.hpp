@@ -10,49 +10,101 @@
 #include <utility>
 
 namespace options {
+    class option_spec;
+
     /// Used in option_spec and validators.
-    struct option {
+    class option {
+        friend class option_spec;
+
+    public:
         using overrides_type = std::unordered_set<std::string>;
         using validator_type = std::function<bool(option)>;
 
-        std::string name;
-        char shorthand = -1;
-        bool has_value;
-        std::string default_value;
-        std::string usage;
-        bool required;
-        overrides_type overrides;
-        validator_type validator;
-        bool present;
-        std::string value;
+        option() = default;
 
-        option &set_name(std::string_view option_name);
+        option(std::string_view name, std::string_view usage);
 
-        option &set_shorthand(char option_shorthand);
+        option(std::string_view name, char shorthand, std::string_view usage);
 
-        option &set_value(std::string_view option_value);
+        option &name(std::string_view name);
 
-        option &clear_value();
+        [[nodiscard]] std::string name() const {
+            return name_;
+        }
 
-        option &set_usage(std::string_view option_usage);
+        option &shorthand(char shorthand);
 
-        option &set_required(bool option_required);
+        [[nodiscard]] char shorthand() const {
+            return shorthand_;
+        }
 
-        option &set_overrides(overrides_type option_overrides);
+        option &default_value(std::string_view value);
 
-        option &add_override(const std::string &option_override);
+        [[nodiscard]] std::string default_value() const {
+            return default_value_;
+        }
 
-        option &clear_overrides();
+        option &usage(std::string_view usage);
 
-        option &set_validator(const validator_type &option_validator);
+        [[nodiscard]] std::string usage() const {
+            return usage_;
+        }
+
+        option &required(bool required);
+
+        [[nodiscard]] bool required() const {
+            return required_;
+        }
+
+        option &overrides(overrides_type overrides);
+
+        [[nodiscard]] const overrides_type &overrides() const {
+            return overrides_;
+        }
+
+        option &add_override(std::string_view override);
+
+        option &validator(const validator_type &validator);
+
+        [[nodiscard]] validator_type validator() const {
+            return validator_;
+        }
+
+        [[nodiscard]] std::string value() const {
+            return value_;
+        }
+
+        [[nodiscard]] constexpr bool present() const {
+            return present_;
+        }
+
+        [[nodiscard]] constexpr bool has_value() const {
+            return has_value_;
+        }
 
         [[nodiscard]] constexpr bool has_shorthand() const {
-            return shorthand > 0;
+            return shorthand_ > 0;
         }
 
         constexpr explicit operator bool() const {
-            return present;
+            return present_;
         }
+
+        constexpr std::string_view operator*() {
+            return value_;
+        }
+
+    private:
+        std::string name_;
+        char shorthand_ = -1;
+        bool has_value_ = false;
+        std::string default_value_;
+        std::string usage_;
+        bool required_ = false;
+        overrides_type overrides_;
+        validator_type validator_;
+        bool present_ = false;
+        std::string value_;
     };
 }
 
